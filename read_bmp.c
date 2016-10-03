@@ -42,24 +42,24 @@ int read_bmp(char* input, char *output) {
 
 
     //Read the data of the image:
-    data = (char*)malloc(sizeof(char)*linewidth);
+    data = (unsigned char*)malloc(sizeof(unsigned char)*linewidth);
     if(data==NULL){
         //cleanup
     }
 
-    fseek(fp,sizeof(char)*hp->fileheader.dataoffset,SEEK_SET);
+    fseek(fp,sizeof(unsigned char)*hp->fileheader.dataoffset,SEEK_SET);
     for(int i=0; i<hp->height; i++)
     {
-      n=fread(data,sizeof(char),linewidth, fp);
+      n=fread(data,sizeof(unsigned char),linewidth, fp);
       for(int j=0; j<hp->width*3; j+=3)
       {
-        arr[i][j+2] = data[j+0];
-        arr[i][j+1] = data[j+1];
-        arr[i][j+0] = data[j+2];
+        arr[i][j+2] = (unsigned char)data[j+0];
+        arr[i][j+1] = (unsigned char)data[j+1];
+        arr[i][j+0] = (unsigned char)data[j+2];
       } 
       
     } 
-    applyfilter(arr, hp->height, hp->width, padding);
+    arr = applyfilter(arr, hp->height, hp->width, padding);
 
     //Open output file:
     out = fopen(output, "w");
@@ -73,9 +73,9 @@ int read_bmp(char* input, char *output) {
       for(int j=0; j<hp->width*3; j+=3)
       {
         //Swapping BGR to RGB values
-         data[j+0] = arr[i][j+2];
-         data[j+1] = arr[i][j+1];
-         data[j+2] = arr[i][j+0];
+         data[j+0] = (char)arr[i][j+2];
+         data[j+1] = (char)arr[i][j+1];
+         data[j+2] = (char)arr[i][j+0];
       } 
       n=fwrite(data,sizeof(char),linewidth,out);
       

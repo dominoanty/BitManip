@@ -1,3 +1,6 @@
+#define FILTER_SIZE 7
+
+// Kernel Matrix
 int filter[7][7] = { { 1, 1, 1, 1, 1, 1, 1 }, 
                      { 1, 1, 1, 1, 1, 1, 1 }, 
                      { 1, 1, 1, 1, 1, 1, 1 }, 
@@ -8,36 +11,53 @@ int filter[7][7] = { { 1, 1, 1, 1, 1, 1, 1 },
 
 #pragma pack(pop)
 
-void applyfilter(int **arr,int height,int width, int padding)
+// Function takes in the original 2D image representation and returns 
+// the blurred image
+int **applyfilter(int **arr,int height,int width, int padding)
 {
   int temp;
   int totalcount;
+  
+  // Allocate the new array for copy
+  int **arr2;
+  arr2= (int**) malloc(sizeof(int*) * height );
+  for(int i=0; i<height;i++)
+  {
+    arr2[i] = (int*) malloc(sizeof(int) * (3*width+padding));
+  }
+  
+  //Sliding window algorithm
   for(int i=0; i<height; i++)
   {
-    for(int j=0; j<width*3; j+=3)
+    for(int j=0; j<width*3; j+=1)
     {
       totalcount=49;
-      for(int k=-3; k<=3; k++)
+      for(int k=-(FILTER_SIZE/2); k<=(FILTER_SIZE/2); k++)
       {
-        for(int l=-3;l<=3; l++)
+        for(int l=-(FILTER_SIZE/2);l<=(FILTER_SIZE/2); l++)
         {
-          if( ((i+k) < 0) || ((j+l) < 0) || ((i+k) >= height) || ((j+l) >= 3*width+padding) )
+          //Make sure the filter doesn't apply out of the window size
+          if( ((i+k*3) < 0) || ((j+l*3) < 0) || 
+              ((i+k*3) >= height) || ((j+l*3) >= 3*width+padding) || 
+              (filter[k+(FILTER_SIZE/2)][l+(FILTER_SIZE/2)] == 0))
           {  
             temp=0;
             totalcount--;
           }
           else
           {
-            printf("\nReached here with arr = %d, filter= %d", arr[i+k][j+l], filter[k+3][l+3]);
-            temp=arr[i+k][j+l]*filter[k+3][l+3];
+            temp=arr[i+k*3][j+l*3]*filter[k+3][l+3];
           } 
-          arr[i][j] = arr[i][j] +  temp;
-          printf("\ni=%d j=%d k=%d l=%d, temp=%d", i,j,k,l, temp);
+          arr2[i][j] = arr2[i][j]+ temp;
         } 
       } 
-      arr[i][j] =(int) arr[i][j]/totalcount;
+      if(totalcount == 0)
+        arr2[i][j] = 0;
+      else
+        arr2[i][j] =(int) arr2[i][j]/totalcount;
     } 
-  } 
+  }
+  return arr2;
 } 
 
 
