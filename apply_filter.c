@@ -1,13 +1,19 @@
 #define FILTER_SIZE 7
-
+#define BLUR 0
+#define EDGE_DETECT 1
 // Kernel Matrix
 int filter[7][7] = { { 1, 1, 1, 1, 1, 1, 1 }, 
-                     { 1, 1, 1, 1, 1, 1, 1 }, 
-                     { 1, 1, 1, 1, 1, 1, 1 }, 
-                     { 1, 1, 1, 1, 1, 1, 1 }, 
-                     { 1, 1, 1, 1, 1, 1, 1 }, 
-                     { 1, 1, 1, 1, 1, 1, 1 }, 
-                     { 1, 1, 1, 1, 1, 1, 1 } }; 
+                    { 1, 1, 1, 1, 1, 1, 1 }, 
+                    { 1, 1, 1, 1, 1, 1, 1 }, 
+                    { 1, 1, 1, 1, 1, 1, 1 }, 
+                    { 1, 1, 1, 1, 1, 1, 1 }, 
+                    { 1, 1, 1, 1, 1, 1, 1 }, 
+                    { 1, 1, 1, 1, 1, 1, 1 } }; 
+
+//int filter[3][3] = { { 0, 0, 0},
+//                     { 0, 0, 0},
+//                     { 0, 0, 0}};
+
 
 #pragma pack(pop)
 
@@ -17,6 +23,7 @@ int **applyfilter(int **arr,int height,int width, int padding)
 {
   int temp;
   int totalcount;
+  int ftype=BLUR;
   
   // Allocate the new array for copy
   int **arr2;
@@ -31,14 +38,16 @@ int **applyfilter(int **arr,int height,int width, int padding)
   {
     for(int j=0; j<width*3; j+=1)
     {
-      totalcount=49;
+      totalcount=FILTER_SIZE*FILTER_SIZE;
       for(int k=-(FILTER_SIZE/2); k<=(FILTER_SIZE/2); k++)
       {
         for(int l=-(FILTER_SIZE/2);l<=(FILTER_SIZE/2); l++)
         {
           //Make sure the filter doesn't apply out of the window size
-          if( ((i+k*3) < 0) || ((j+l*3) < 0) || 
-              ((i+k*3) >= height) || ((j+l*3) >= 3*width+padding) || 
+          if( ((i+k*3) < 0) || 
+              ((j+l*3) < 0) || 
+              ((i+k*3) >= height) || 
+              ((j+l*3) >= 3*width+padding) || 
               (filter[k+(FILTER_SIZE/2)][l+(FILTER_SIZE/2)] == 0))
           {  
             temp=0;
@@ -46,15 +55,21 @@ int **applyfilter(int **arr,int height,int width, int padding)
           }
           else
           {
-            temp=arr[i+k*3][j+l*3]*filter[k+3][l+3];
+            temp = arr[i+k*3][j+l*3] * 
+                   filter[k+(FILTER_SIZE/2)][l+(FILTER_SIZE/2)];
           } 
           arr2[i][j] = arr2[i][j]+ temp;
         } 
       } 
-      if(totalcount == 0)
-        arr2[i][j] = 0;
-      else
-        arr2[i][j] =(int) arr2[i][j]/totalcount;
+      if(ftype != BLUR)
+      {
+
+        if(totalcount == 0)
+          arr2[i][j] = 0;
+        else
+          arr2[i][j] =(int) arr2[i][j]/totalcount;
+
+      }
     } 
   }
   return arr2;

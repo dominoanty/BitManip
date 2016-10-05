@@ -26,14 +26,23 @@ int read_bmp(char* input, char *output) {
     if(n<1){
         //cleanup
     }
-    printf("\n The height of the image is %d", hp->height);
-    printf("\n The width of the image is %d", hp->width);
-    printf("\n The bitmap size is %d", hp->bitmapsize);
+    printf("\n The width  is %d", hp->bitmapsize);
+    printf("\n The height  is %d", hp->bitmapsize);
+    printf("\n The bitsperpixel is %d", hp->bitsperpixel);
+    printf("\n The compression is %d", hp->compression);
+    printf("\n The horizontal res  is %d", hp->horizontalres);
+    printf("\n The vertical res  is %d", hp->verticalres);
+    printf("\n The numcolors  is %d", hp->numcolors);
+    printf("\n The offset size is %d", hp->fileheader.dataoffset);
 
     // Setting up parameters and array
-    padding = 4 - hp->width%4;
+    padding = (4 - hp->width%4)%4;
     linewidth= 3*hp->width + padding;
     arr= (int**) malloc(sizeof(int*) * hp->height );
+
+    // Print out padding
+    printf("\nThe padding is %d", padding);
+
     for(int i=0; i<hp->height;i++)
     {
       arr[i] = (int*) malloc(sizeof(int) * linewidth);
